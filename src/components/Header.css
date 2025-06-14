@@ -1,0 +1,18 @@
+.header-sonne {
+  background-color: #f5ede4 !important;
+  font-family: 'Monday Sans', Arial, sans-serif;
+}
+
+.header-sonne h1 {
+  font-family: 'Monday Sans', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #4b2e13;
+}
+
+.subtitulo {
+  font-family: 'Monday Sans', Arial, sans-serif;
+  color: #7c5a36;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+} 
