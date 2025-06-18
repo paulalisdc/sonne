@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./ProductForm.css";
+import TablaProductos from "./TablaProductos"; //martina
 
 const ProductForm = () => {
 
@@ -39,6 +40,7 @@ const ProductForm = () => {
       ...formulario,
       cantidad: Number(formulario.cantidad),
       precio: Number(formulario.precio),
+       fecha: new Date().toLocaleDateString(), //martina
     };
 
     setProductos([...productos, nuevoProducto]);
@@ -55,6 +57,7 @@ const ProductForm = () => {
   };
   //martina
     return (
+         <> {/* martina: usamos fragmento para agrupar el form + tabla */}
       <form className="product-form" onSubmit={agregarProducto}> 
         <h2>Agregar producto al stock</h2>
   
@@ -114,6 +117,14 @@ const ProductForm = () => {
   
         <button type="submit" className="btn btn-primary">Agregar</button>
       </form>
+      
+  {/* martina: mostramos la tabla SOLO si hay productos */}
+      {productos.length > 0 && (
+        <TablaProductos productos={productos} />
+      )}
+
+    </> // fin del fragmento
+      
     );
   };
   
