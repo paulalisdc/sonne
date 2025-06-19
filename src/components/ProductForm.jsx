@@ -174,6 +174,7 @@ const ProductForm = () => {
             min="1"
             max="200"
             step="1"
+            maxLength={3}
           />
           {errores.cantidad && <div className="invalid-feedback">{errores.cantidad}</div>}
         </div>
@@ -191,6 +192,7 @@ const ProductForm = () => {
             min="0.01"
             max="10000"
             step="0.01"
+            maxLength={7}
           />
           {errores.precio && <div className="invalid-feedback">{errores.precio}</div>}
         </div>
