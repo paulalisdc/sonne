@@ -18,9 +18,18 @@ const ProductForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Aplicar límites de caracteres
+    let valorLimitado = value;
+    if (name === 'cantidad' && value.length > 3) {
+      valorLimitado = value.slice(0, 3);
+    } else if (name === 'precio' && value.length > 5) {
+      valorLimitado = value.slice(0, 5);
+    }
+    
     setFormulario({
       ...formulario,
-      [name]: value,
+      [name]: valorLimitado,
     });
     
     // Limpiar error del campo cuando el usuario empieza a escribir
@@ -162,7 +171,7 @@ const ProductForm = () => {
         </div>
   
         <div className="mb-3">
-          <label htmlFor="cantidad" className="form-label">Cantidad</label>
+          <label htmlFor="cantidad" className="form-label">Cantidad (máx. 3 dígitos)</label>
           <input
             type="number"
             id="cantidad"
@@ -174,13 +183,12 @@ const ProductForm = () => {
             min="1"
             max="200"
             step="1"
-            maxLength={3}
           />
           {errores.cantidad && <div className="invalid-feedback">{errores.cantidad}</div>}
         </div>
   
         <div className="mb-3">
-          <label htmlFor="precio" className="form-label">Precio unitario ($)</label>
+          <label htmlFor="precio" className="form-label">Precio unitario ($ - máx. 5 dígitos)</label>
           <input
             type="number"
             id="precio"
@@ -192,7 +200,6 @@ const ProductForm = () => {
             min="0.01"
             max="10000"
             step="0.01"
-            maxLength={7}
           />
           {errores.precio && <div className="invalid-feedback">{errores.precio}</div>}
         </div>
@@ -201,9 +208,7 @@ const ProductForm = () => {
       </form>
       
       {/* martina: mostramos la tabla SOLO si hay productos */}
-      {(
-        <TablaProductos productos={productos} />
-      )}
+      <TablaProductos productos={productos} />
 
     </> // fin del fragmento
       
