@@ -86,6 +86,9 @@ const ProductForm = () => {
             placeholder="Ej: Collar IRIS"
              value={formulario.producto}
             onChange={handleChange}
+            required
+            min={1}
+            max={50}
           />
         </div>
   
