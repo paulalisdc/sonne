@@ -119,7 +119,7 @@ const ProductForm = () => {
       </form>
       
   {/* martina: mostramos la tabla SOLO si hay productos */}
-      {productos.length > 0 && (
+      {(
         <TablaProductos productos={productos} />
       )}
 
