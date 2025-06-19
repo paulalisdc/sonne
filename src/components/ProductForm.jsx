@@ -14,6 +14,7 @@ const ProductForm = () => {
   });
 
   const [productos, setProductos] = useState([]);
+  const [errores, setErrores] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,51 +22,119 @@ const ProductForm = () => {
       ...formulario,
       [name]: value,
     });
+    
+    // Limpiar error del campo cuando el usuario empieza a escribir
+    if (errores[name]) {
+      setErrores({
+        ...errores,
+        [name]: ""
+      });
+    }
+  };
+
+  const validarFormulario = () => {
+    const nuevosErrores = {};
+
+    // Validar categoría
+    if (!formulario.categoria) {
+      nuevosErrores.categoria = "Debe seleccionar una categoría";
+    }
+
+    // Validar producto
+    if (!formulario.producto.trim()) {
+      nuevosErrores.producto = "El nombre del producto es obligatorio";
+    } else if (formulario.producto.trim().length < 2) {
+      nuevosErrores.producto = "El nombre debe tener al menos 2 caracteres";
+    } else if (formulario.producto.trim().length > 50) {
+      nuevosErrores.producto = "El nombre no puede superar los 50 caracteres";
+    } else if (!/^[a-zA-ZÀ-ÿ\s\d\-_]+$/.test(formulario.producto.trim())) {
+      nuevosErrores.producto = "El nombre solo puede contener letras, números, espacios y guiones";
+    }
+
+    // Validar cantidad
+    if (!formulario.cantidad) {
+      nuevosErrores.cantidad = "La cantidad es obligatoria";
+    } else {
+      const cantidad = Number(formulario.cantidad);
+      if (isNaN(cantidad) || cantidad <= 0) {
+        nuevosErrores.cantidad = "La cantidad debe ser un número mayor a 0";
+      } else if (cantidad > 200) {
+        nuevosErrores.cantidad = "La cantidad no puede superar las 200 unidades";
+      } else if (!Number.isInteger(cantidad)) {
+        nuevosErrores.cantidad = "La cantidad debe ser un número entero";
+      }
+    }
+
+    // Validar precio
+    if (!formulario.precio) {
+      nuevosErrores.precio = "El precio es obligatorio";
+    } else {
+      const precio = Number(formulario.precio);
+      if (isNaN(precio) || precio <= 0) {
+        nuevosErrores.precio = "El precio debe ser un número mayor a 0";
+      } else if (precio > 10000) {
+        nuevosErrores.precio = "El precio no puede superar $10,000";
+      }
+    }
+
+    // Validar duplicados
+    const productoExistente = productos.find(
+      p => p.categoria.toLowerCase() === formulario.categoria.toLowerCase() && 
+           p.producto.toLowerCase().trim() === formulario.producto.toLowerCase().trim()
+    );
+    
+    if (productoExistente) {
+      nuevosErrores.producto = "Este producto ya existe en la categoría seleccionada";
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
   const agregarProducto = (e) => {
     e.preventDefault();
 
-    if (
-      formulario.categoria === "" ||
-      formulario.producto === "" ||
-      formulario.cantidad === "" ||
-      formulario.precio === ""
-    ) {
-      alert("Por favor completá todos los campos.");
+    if (!validarFormulario()) {
       return;
     }
 
     const nuevoProducto = {
       ...formulario,
+      producto: formulario.producto.trim(),
       cantidad: Number(formulario.cantidad),
       precio: Number(formulario.precio),
-       fecha: new Date().toLocaleDateString(), //martina
+      fecha: new Date().toLocaleDateString(), //martina
     };
 
     setProductos([...productos, nuevoProducto]);
 
-    // Limpia el formulario
+    // Limpia el formulario y errores
     setFormulario({
       categoria: "",
       producto: "",
       cantidad: "",
       precio: "",
     });
+    setErrores({});
 
     console.log("Producto agregado:", nuevoProducto);
   };
+  
   //martina
-    return (
-         <> {/* martina: usamos fragmento para agrupar el form + tabla */}
+  return (
+    <> {/* martina: usamos fragmento para agrupar el form + tabla */}
       <form className="product-form" onSubmit={agregarProducto}> 
         <h2>Agregar producto al stock</h2>
   
         <div className="mb-3">
           <label htmlFor="categoria" className="form-label">Categoría</label>
-          <select id="categoria" name="categoria" className="form-select" value={formulario.categoria}
-        onChange={handleChange}>
-            
+          <select 
+            id="categoria" 
+            name="categoria" 
+            className={`form-select ${errores.categoria ? 'is-invalid' : ''}`} 
+            value={formulario.categoria}
+            onChange={handleChange}
+          >
             <option value="">Seleccionar</option>
             <option value="Aros">Aros</option>
             <option value="Collares">Collares</option>
@@ -74,6 +143,7 @@ const ProductForm = () => {
             <option value="Relojes">Relojes</option>
             <option value="Otros">Otros</option>
           </select>
+          {errores.categoria && <div className="invalid-feedback">{errores.categoria}</div>}
         </div>
   
         <div className="mb-3">
@@ -82,14 +152,13 @@ const ProductForm = () => {
             type="text"
             id="producto"
             name="producto"
-            className="form-control"
+            className={`form-control ${errores.producto ? 'is-invalid' : ''}`}
             placeholder="Ej: Collar IRIS"
-             value={formulario.producto}
+            value={formulario.producto}
             onChange={handleChange}
-            required
-            min={1}
-            max={50}
+            maxLength={50}
           />
+          {errores.producto && <div className="invalid-feedback">{errores.producto}</div>}
         </div>
   
         <div className="mb-3">
@@ -98,11 +167,15 @@ const ProductForm = () => {
             type="number"
             id="cantidad"
             name="cantidad"
-            className="form-control"
+            className={`form-control ${errores.cantidad ? 'is-invalid' : ''}`}
             placeholder="Ej: 10"
             value={formulario.cantidad}
             onChange={handleChange}
+            min="1"
+            max="200"
+            step="1"
           />
+          {errores.cantidad && <div className="invalid-feedback">{errores.cantidad}</div>}
         </div>
   
         <div className="mb-3">
@@ -111,26 +184,28 @@ const ProductForm = () => {
             type="number"
             id="precio"
             name="precio"
-            className="form-control"
+            className={`form-control ${errores.precio ? 'is-invalid' : ''}`}
             placeholder="Ej: 2500"
             value={formulario.precio}
             onChange={handleChange}
+            min="0.01"
+            max="10000"
+            step="0.01"
           />
+          {errores.precio && <div className="invalid-feedback">{errores.precio}</div>}
         </div>
   
         <button type="submit" className="btn btn-primary">Agregar</button>
       </form>
       
-  {/* martina: mostramos la tabla SOLO si hay productos */}
+      {/* martina: mostramos la tabla SOLO si hay productos */}
       {(
         <TablaProductos productos={productos} />
       )}
 
     </> // fin del fragmento
       
-    );
-  };
+  );
+};
   
-  export default ProductForm;
-  
-  
+export default ProductForm;
