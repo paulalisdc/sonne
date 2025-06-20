@@ -15,6 +15,46 @@ const ProductForm = () => {
 
   const [productos, setProductos] = useState([]);
   const [errores, setErrores] = useState({});
+  const [editandoIndex, setEditandoIndex] = useState(null);
+
+  const iniciarEdicion = (index) => {
+  const producto = productos[index];
+  setFormulario({
+    categoria: producto.categoria,
+    producto: producto.producto,
+    cantidad: producto.cantidad.toString(),
+    precio: producto.precio.toString(),
+  });
+  setEditandoIndex(index);
+};
+const guardarEdicion = (e) => {
+  e.preventDefault();
+
+  if (!validarFormulario()) return;
+
+  const productoEditado = {
+    ...formulario,
+    producto: formulario.producto.trim(),
+    cantidad: Number(formulario.cantidad),
+    precio: Number(formulario.precio),
+    fecha: productos[editandoIndex].fecha, // mantener fecha original
+  };
+
+  const nuevosProductos = [...productos];
+  nuevosProductos[editandoIndex] = productoEditado;
+
+  setProductos(nuevosProductos);
+  setFormulario({
+    categoria: "",
+    producto: "",
+    cantidad: "",
+    precio: "",
+  });
+  setErrores({});
+  setEditandoIndex(null);
+};
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,14 +127,20 @@ const ProductForm = () => {
     }
 
     // Validar duplicados
-    const productoExistente = productos.find(
-      p => p.categoria.toLowerCase() === formulario.categoria.toLowerCase() && 
-           p.producto.toLowerCase().trim() === formulario.producto.toLowerCase().trim()
-    );
-    
-    if (productoExistente) {
-      nuevosErrores.producto = "Este producto ya existe en la categoría seleccionada";
-    }
+   const productoExistente = productos.find((p, index) => {
+  const esMismoNombreYCategoria =
+    p.categoria.toLowerCase() === formulario.categoria.toLowerCase() &&
+    p.producto.toLowerCase().trim() === formulario.producto.toLowerCase().trim();
+
+  const esOtroProducto = editandoIndex === null || index !== editandoIndex;
+
+  return esMismoNombreYCategoria && esOtroProducto;
+});
+
+if (productoExistente) {
+  nuevosErrores.producto = "Este producto ya existe en la categoría seleccionada";
+}
+
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
@@ -132,7 +178,8 @@ const ProductForm = () => {
   //martina
   return (
     <> {/* martina: usamos fragmento para agrupar el form + tabla */}
-      <form className="product-form" onSubmit={agregarProducto}> 
+    <form className="product-form" onSubmit={editandoIndex === null ? agregarProducto : guardarEdicion}>
+
         <h2>Agregar producto al stock</h2>
   
         <div className="mb-3">
@@ -203,12 +250,20 @@ const ProductForm = () => {
           />
           {errores.precio && <div className="invalid-feedback">{errores.precio}</div>}
         </div>
-  
-        <button type="submit" className="btn btn-primary">Agregar</button>
+<button type="submit" className="btn btn-primary">
+  {editandoIndex === null ? "Agregar" : "Guardar cambios"}
+</button>
       </form>
       
-      {/* martina: mostramos la tabla SOLO si hay productos */}
-      <TablaProductos productos={productos} />
+    <TablaProductos
+  productos={productos}
+  eliminarProducto={(index) => {
+    const nuevosProductos = productos.filter((_, i) => i !== index);
+    setProductos(nuevosProductos);
+  }}
+  editarProducto={iniciarEdicion}
+/>
+
 
     </> // fin del fragmento
       

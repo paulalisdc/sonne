@@ -1,4 +1,5 @@
-const TablaProductos = ({ productos }) => {
+const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
+
   return (
     <div className="tabla-productos">
       <h2>Stock cargado</h2>
@@ -11,6 +12,7 @@ const TablaProductos = ({ productos }) => {
             <th>Cantidad</th>
             <th>Precio unitario ($)</th>
             <th>Total ($)</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -22,6 +24,25 @@ const TablaProductos = ({ productos }) => {
               <td>{p.cantidad}</td>
               <td>{p.precio}</td>
               <td>{p.cantidad * p.precio}</td>
+           <td>
+  <button
+    className="btn btn-warning btn-sm me-2"
+    onClick={() => editarProducto(index)}
+  >
+    Editar
+  </button>
+  <button
+    className="btn btn-danger btn-sm"
+    onClick={() => {
+      if (window.confirm(`¿Estás seguro que querés eliminar "${p.producto}" de la categoría "${p.categoria}"?`)) {
+        eliminarProducto(index);
+      }
+    }}
+  >
+    Eliminar
+  </button>
+</td>
+
             </tr>
           ))}
         </tbody>
