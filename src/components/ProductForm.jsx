@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "./ProductForm.css";
 import TablaProductos from "./TablaProductos"; //martina
+import useLocalStorage from "../hooks/useLocalStorage";
+import StorageInfo from "./StorageInfo";
 
 const ProductForm = () => {
 
@@ -13,9 +15,11 @@ const ProductForm = () => {
     precio: "",
   });
 
-  const [productos, setProductos] = useState([]);
+  // Usar localStorage para los productos en lugar de useState
+  const [productos, setProductos] = useLocalStorage("productos", []);
   const [errores, setErrores] = useState({});
   const [editandoIndex, setEditandoIndex] = useState(null);
+  const [mostrarExito, setMostrarExito] = useState(false);
 
   const iniciarEdicion = (index) => {
   const producto = productos[index];
@@ -172,7 +176,28 @@ if (productoExistente) {
     });
     setErrores({});
 
+    // Mostrar mensaje de éxito
+    setMostrarExito(true);
+    setTimeout(() => {
+      setMostrarExito(false);
+    }, 3000); // Ocultar después de 3 segundos
+
     console.log("Producto agregado:", nuevoProducto);
+  };
+
+  // Función para limpiar todos los datos del localStorage
+  const limpiarStorage = () => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar todos los productos? Esta acción no se puede deshacer.")) {
+      setProductos([]);
+      setEditandoIndex(null);
+      setFormulario({
+        categoria: "",
+        producto: "",
+        cantidad: "",
+        precio: "",
+      });
+      setErrores({});
+    }
   };
   
   //martina
@@ -181,6 +206,14 @@ if (productoExistente) {
     <form className="product-form" onSubmit={editandoIndex === null ? agregarProducto : guardarEdicion}>
 
         <h2>Agregar producto al stock</h2>
+  
+        {/* Mensaje de éxito */}
+        {mostrarExito && (
+          <div className="alert alert-success d-flex align-items-center" role="alert">
+            <i className="fa fa-check-circle me-2" style={{color: '#D8D7B2', fontSize: '1.2rem'}}></i>
+            <span>¡Producto agregado exitosamente!</span>
+          </div>
+        )}
   
         <div className="mb-3">
           <label htmlFor="categoria" className="form-label">Categoría</label>
@@ -254,6 +287,11 @@ if (productoExistente) {
   {editandoIndex === null ? "Agregar" : "Guardar cambios"}
 </button>
       </form>
+
+    <StorageInfo 
+      productos={productos} 
+      onClearStorage={limpiarStorage}
+    />
       
     <TablaProductos
   productos={productos}
@@ -263,7 +301,6 @@ if (productoExistente) {
   }}
   editarProducto={iniciarEdicion}
 />
-
 
     </> // fin del fragmento
       
