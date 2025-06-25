@@ -1,5 +1,5 @@
 .header-sonne {
-  background-color: #f5ede4 !important;
+  background-color: #ede3d8 !important;
   font-family: 'Poppins', Arial, sans-serif;
 }
 
@@ -15,4 +15,10 @@
   color: #7c5a36;
   font-size: 1rem;
   letter-spacing: 0.5px;
+}
+
+/* Estilos para hacer el logo redondo */
+.header-sonne img {
+  border-radius: 50%;
+  object-fit: cover;
 } 

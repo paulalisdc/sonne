@@ -2,13 +2,13 @@ import './Header.css';
 
 const Header = () => {
     return (
-      <header className="header-sonne shadow-sm py-3 mb-4">
+      <header className="header-sonne shadow-sm py-1 mb-4">
         <div className="container d-flex align-items-center">
           <img
             src="/logo-sonne.png"
             alt="Logo Sonne"
-            width="50"
-            height="50"
+            width="80"
+            height="80"
             className="me-3"
           />
           <div>

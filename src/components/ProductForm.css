@@ -39,7 +39,7 @@
 /* Botón principal (Agregar/Guardar) */
 .btn-primary {
   color: white;
-  background-color: #C5D3E8;
+  background-color: #9DA9BA;
   border: none;
   padding: 0.75rem 2rem;
   font-weight: 500;
@@ -50,7 +50,7 @@
 
 /* Efecto hover en el botón principal */
 .btn-primary:hover {
-  background-color: #acbace;
+  background-color: #8A94A2;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -131,7 +131,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* Encabezados de la tabla */
 .tabla-productos .table thead th {
-  background-color: #E5E0D8 ;
+  background-color: #cec6b7;
   color: white;
   font-weight: 600;
   border: none;
@@ -183,7 +183,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* Botón de editar (amarillo/naranja) */
 .tabla-productos .btn-warning {
-  background-color: #D8D7B2;
+  background-color: #C2C2A0;
   border: none;
   color: white;
   width: 40px;
@@ -197,14 +197,14 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* Efecto hover en botón de editar */
 .tabla-productos .btn-warning:hover {
-  background-color: #b8b695;
+  background-color: #ADAC8E;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Botón de eliminar (rojo) */
 .tabla-productos .btn-danger {
-  background-color: #E5ADA8;
+  background-color: #CE9C97;
   border: none;
   color: white;
   width: 40px;
@@ -218,7 +218,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* Efecto hover en botón de eliminar */
 .tabla-productos .btn-danger:hover {
-  background-color: #cc9a96;
+  background-color: #B78A86;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -227,8 +227,8 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* Botón "Limpiar todos los datos" */
 .text-end .btn-outline-danger {
-  border-color: #e77c70;
-  color: #e77c70;
+  border-color: #D18B82;
+  color: #D18B82;
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -238,8 +238,8 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* Efecto hover en botón de limpiar */
 .text-end .btn-outline-danger:hover {
-  background-color: #e77c70;
-  border-color: #e77c70;
+  background-color: #D18B82;
+  border-color: #D18B82;
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
