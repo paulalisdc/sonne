@@ -1,4 +1,6 @@
-const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
+// Componente que muestra la tabla de productos con opciones de editar y eliminar
+const TablaProductos = ({ productos, eliminarProducto, editarProducto, loading }) => {
+  // Función para formatear precios en formato de moneda argentina
   const formatearMoneda = (valor) => {
     return `$${Number(valor).toLocaleString("es-AR")}`;
   };
@@ -21,12 +23,14 @@ const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
             </tr>
           </thead>
           <tbody>
+            {/* Iterar sobre cada producto para mostrar en la tabla */}
             {productos.map((p, index) => (
-              <tr key={index}>
+              <tr key={p.id || index}>
                 <td>{p.fecha}</td>
                 <td>{p.categoria}</td>
                 <td>{p.producto}</td>
                 <td>
+                  {/* Mostrar imagen del producto si existe, sino mostrar texto */}
                   {p.imagenUrl ? (
                     <img
                       src={p.imagenUrl}
@@ -37,34 +41,34 @@ const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
                         objectFit: "cover",
                         borderRadius: "6px",
                       }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'inline';
+                      }}
                     />
-                  ) : (
-                    <span className="text-muted">Sin imagen</span>
-                  )}
+                  ) : null}
+                  <span className="text-muted" style={{ display: p.imagenUrl ? 'none' : 'inline' }}>
+                    Sin imagen
+                  </span>
                 </td>
                 <td>{p.cantidad}</td>
                 <td className="text-end">{formatearMoneda(p.precio)}</td>
                 <td className="text-end">{formatearMoneda(p.cantidad * p.precio)}</td>
                 <td>
+                  {/* Botones de editar y eliminar producto */}
                   <button
                     className="btn btn-warning btn-sm me-2"
                     onClick={() => editarProducto(index)}
                     title="Editar producto"
+                    disabled={loading}
                   >
                     <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
                   </button>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          `¿Estás seguro que querés eliminar "${p.producto}" de la categoría "${p.categoria}"?`
-                        )
-                      ) {
-                        eliminarProducto(index);
-                      }
-                    }}
+                    onClick={() => eliminarProducto(index)}
                     title="Eliminar producto"
+                    disabled={loading}
                   >
                     <i className="fa fa-times" aria-hidden="true"></i>
                   </button>
@@ -73,6 +77,14 @@ const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
             ))}
           </tbody>
         </table>
+        
+        {/* Mensaje cuando no hay productos */}
+        {productos.length === 0 && !loading && (
+          <div className="text-center py-4">
+            <i className="fas fa-box-open text-muted" style={{ fontSize: '3rem' }}></i>
+            <p className="text-muted mt-3">No hay productos cargados</p>
+          </div>
+        )}
       </div>
     </div>
   );
