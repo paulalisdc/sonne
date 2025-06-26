@@ -1,20 +1,19 @@
 const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
-
-  // Función para formatear números como moneda
   const formatearMoneda = (valor) => {
-    return `$${Number(valor).toLocaleString('es-AR')}`;
+    return `$${Number(valor).toLocaleString("es-AR")}`;
   };
 
   return (
     <div className="tabla-productos">
       <h2>Stock cargado</h2>
       <div className="table-responsive">
-        <table className="table table-bordered">
+        <table className="table table-bordered align-middle text-center">
           <thead>
             <tr>
               <th>Fecha</th>
               <th>Categoría</th>
               <th>Producto</th>
+              <th>Imagen</th>
               <th>Cantidad</th>
               <th className="text-end">Precio ($)</th>
               <th className="text-end">Total ($)</th>
@@ -27,6 +26,22 @@ const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
                 <td>{p.fecha}</td>
                 <td>{p.categoria}</td>
                 <td>{p.producto}</td>
+                <td>
+                  {p.imagenUrl ? (
+                    <img
+                      src={p.imagenUrl}
+                      alt={p.producto}
+                      style={{
+                        width: "150px",
+                        height: "150px",
+                        objectFit: "cover",
+                        borderRadius: "6px",
+                      }}
+                    />
+                  ) : (
+                    <span className="text-muted">Sin imagen</span>
+                  )}
+                </td>
                 <td>{p.cantidad}</td>
                 <td className="text-end">{formatearMoneda(p.precio)}</td>
                 <td className="text-end">{formatearMoneda(p.cantidad * p.precio)}</td>
@@ -41,7 +56,11 @@ const TablaProductos = ({ productos, eliminarProducto, editarProducto }) => {
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={() => {
-                      if (window.confirm(`¿Estás seguro que querés eliminar "${p.producto}" de la categoría "${p.categoria}"?`)) {
+                      if (
+                        window.confirm(
+                          `¿Estás seguro que querés eliminar "${p.producto}" de la categoría "${p.categoria}"?`
+                        )
+                      ) {
                         eliminarProducto(index);
                       }
                     }}

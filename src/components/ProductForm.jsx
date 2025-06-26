@@ -1,86 +1,81 @@
 import { useState } from "react";
 import "./ProductForm.css";
-import TablaProductos from "./TablaProductos"; //martina
+import TablaProductos from "./TablaProductos";
 import useLocalStorage from "../hooks/useLocalStorage";
 import StorageInfo from "./StorageInfo";
 
 const ProductForm = () => {
-
-  //martina
-  
   const [formulario, setFormulario] = useState({
     categoria: "",
     producto: "",
     cantidad: "",
     precio: "",
+    imagenUrl: "", // nuevo campo
   });
 
-  // Usar localStorage para los productos en lugar de useState
   const [productos, setProductos] = useLocalStorage("productos", []);
   const [errores, setErrores] = useState({});
   const [editandoIndex, setEditandoIndex] = useState(null);
   const [mostrarExito, setMostrarExito] = useState(false);
 
   const iniciarEdicion = (index) => {
-  const producto = productos[index];
-  setFormulario({
-    categoria: producto.categoria,
-    producto: producto.producto,
-    cantidad: producto.cantidad.toString(),
-    precio: producto.precio.toString(),
-  });
-  setEditandoIndex(index);
-};
-const guardarEdicion = (e) => {
-  e.preventDefault();
-
-  if (!validarFormulario()) return;
-
-  const productoEditado = {
-    ...formulario,
-    producto: formulario.producto.trim(),
-    cantidad: Number(formulario.cantidad),
-    precio: Number(formulario.precio),
-    fecha: productos[editandoIndex].fecha, // mantener fecha original
+    const producto = productos[index];
+    setFormulario({
+      categoria: producto.categoria,
+      producto: producto.producto,
+      cantidad: producto.cantidad.toString(),
+      precio: producto.precio.toString(),
+      imagenUrl: producto.imagenUrl || "", // nuevo campo
+    });
+    setEditandoIndex(index);
   };
 
-  const nuevosProductos = [...productos];
-  nuevosProductos[editandoIndex] = productoEditado;
+  const guardarEdicion = (e) => {
+    e.preventDefault();
+    if (!validarFormulario()) return;
 
-  setProductos(nuevosProductos);
-  setFormulario({
-    categoria: "",
-    producto: "",
-    cantidad: "",
-    precio: "",
-  });
-  setErrores({});
-  setEditandoIndex(null);
-};
+    const productoEditado = {
+      ...formulario,
+      producto: formulario.producto.trim(),
+      cantidad: Number(formulario.cantidad),
+      precio: Number(formulario.precio),
+      fecha: productos[editandoIndex].fecha,
+    };
 
+    const nuevosProductos = [...productos];
+    nuevosProductos[editandoIndex] = productoEditado;
 
+    setProductos(nuevosProductos);
+    setFormulario({
+      categoria: "",
+      producto: "",
+      cantidad: "",
+      precio: "",
+      imagenUrl: "",
+    });
+    setErrores({});
+    setEditandoIndex(null);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Aplicar límites de caracteres
     let valorLimitado = value;
-    if (name === 'cantidad' && value.length > 3) {
+
+    if (name === "cantidad" && value.length > 3) {
       valorLimitado = value.slice(0, 3);
-    } else if (name === 'precio' && value.length > 5) {
+    } else if (name === "precio" && value.length > 5) {
       valorLimitado = value.slice(0, 5);
     }
-    
+
     setFormulario({
       ...formulario,
       [name]: valorLimitado,
     });
-    
-    // Limpiar error del campo cuando el usuario empieza a escribir
+
     if (errores[name]) {
       setErrores({
         ...errores,
-        [name]: ""
+        [name]: "",
       });
     }
   };
@@ -88,12 +83,10 @@ const guardarEdicion = (e) => {
   const validarFormulario = () => {
     const nuevosErrores = {};
 
-    // Validar categoría
     if (!formulario.categoria) {
       nuevosErrores.categoria = "Debe seleccionar una categoría";
     }
 
-    // Validar producto
     if (!formulario.producto.trim()) {
       nuevosErrores.producto = "El nombre del producto es obligatorio";
     } else if (formulario.producto.trim().length < 2) {
@@ -104,7 +97,6 @@ const guardarEdicion = (e) => {
       nuevosErrores.producto = "El nombre solo puede contener letras, números, espacios y guiones";
     }
 
-    // Validar cantidad
     if (!formulario.cantidad) {
       nuevosErrores.cantidad = "La cantidad es obligatoria";
     } else {
@@ -118,7 +110,6 @@ const guardarEdicion = (e) => {
       }
     }
 
-    // Validar precio
     if (!formulario.precio) {
       nuevosErrores.precio = "El precio es obligatorio";
     } else {
@@ -130,21 +121,26 @@ const guardarEdicion = (e) => {
       }
     }
 
-    // Validar duplicados
-   const productoExistente = productos.find((p, index) => {
-  const esMismoNombreYCategoria =
-    p.categoria.toLowerCase() === formulario.categoria.toLowerCase() &&
-    p.producto.toLowerCase().trim() === formulario.producto.toLowerCase().trim();
+    if (
+      formulario.imagenUrl &&
+      !/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(formulario.imagenUrl.trim())
+    ) {
+      nuevosErrores.imagenUrl = "Debe ser una URL válida de imagen (jpg, png, etc)";
+    }
 
-  const esOtroProducto = editandoIndex === null || index !== editandoIndex;
+    const productoExistente = productos.find((p, index) => {
+      const esMismoNombreYCategoria =
+        p.categoria.toLowerCase() === formulario.categoria.toLowerCase() &&
+        p.producto.toLowerCase().trim() === formulario.producto.toLowerCase().trim();
 
-  return esMismoNombreYCategoria && esOtroProducto;
-});
+      const esOtroProducto = editandoIndex === null || index !== editandoIndex;
 
-if (productoExistente) {
-  nuevosErrores.producto = "Este producto ya existe en la categoría seleccionada";
-}
+      return esMismoNombreYCategoria && esOtroProducto;
+    });
 
+    if (productoExistente) {
+      nuevosErrores.producto = "Este producto ya existe en la categoría seleccionada";
+    }
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
@@ -152,42 +148,31 @@ if (productoExistente) {
 
   const agregarProducto = (e) => {
     e.preventDefault();
-
-    if (!validarFormulario()) {
-      return;
-    }
+    if (!validarFormulario()) return;
 
     const nuevoProducto = {
       ...formulario,
       producto: formulario.producto.trim(),
       cantidad: Number(formulario.cantidad),
       precio: Number(formulario.precio),
-      fecha: new Date().toLocaleDateString(), //martina
+      fecha: new Date().toLocaleDateString(),
     };
 
     setProductos([...productos, nuevoProducto]);
-
-    // Limpia el formulario y errores
     setFormulario({
       categoria: "",
       producto: "",
       cantidad: "",
       precio: "",
+      imagenUrl: "",
     });
     setErrores({});
-
-    // Mostrar mensaje de éxito
     setMostrarExito(true);
-    setTimeout(() => {
-      setMostrarExito(false);
-    }, 3000); // Ocultar después de 3 segundos
-
-    console.log("Producto agregado:", nuevoProducto);
+    setTimeout(() => setMostrarExito(false), 3000);
   };
 
-  // Función para limpiar todos los datos del localStorage
   const limpiarStorage = () => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar todos los productos? Esta acción no se puede deshacer.")) {
+    if (window.confirm("¿Estás seguro de que quieres eliminar todos los productos?")) {
       setProductos([]);
       setEditandoIndex(null);
       setFormulario({
@@ -195,32 +180,33 @@ if (productoExistente) {
         producto: "",
         cantidad: "",
         precio: "",
+        imagenUrl: "",
       });
       setErrores({});
     }
   };
-  
-  //martina
-  return (
-    <> {/* martina: usamos fragmento para agrupar el form + tabla */}
-    <form className="product-form" onSubmit={editandoIndex === null ? agregarProducto : guardarEdicion}>
 
+  return (
+    <>
+      <form
+        className="product-form"
+        onSubmit={editandoIndex === null ? agregarProducto : guardarEdicion}
+      >
         <h2>Agregar producto al stock</h2>
-  
-        {/* Mensaje de éxito */}
+
         {mostrarExito && (
           <div className="alert alert-success d-flex align-items-center" role="alert">
-            <i className="fa fa-check-circle me-2" style={{color: '#D8D7B2', fontSize: '1.2rem'}}></i>
+            <i className="fa fa-check-circle me-2" style={{ color: "#D8D7B2", fontSize: "1.2rem" }}></i>
             <span>¡Producto agregado exitosamente!</span>
           </div>
         )}
-  
+
         <div className="mb-3">
           <label htmlFor="categoria" className="form-label">Categoría</label>
-          <select 
-            id="categoria" 
-            name="categoria" 
-            className={`form-select ${errores.categoria ? 'is-invalid' : ''}`} 
+          <select
+            id="categoria"
+            name="categoria"
+            className={`form-select ${errores.categoria ? "is-invalid" : ""}`}
             value={formulario.categoria}
             onChange={handleChange}
           >
@@ -234,14 +220,14 @@ if (productoExistente) {
           </select>
           {errores.categoria && <div className="invalid-feedback">{errores.categoria}</div>}
         </div>
-  
+
         <div className="mb-3">
           <label htmlFor="producto" className="form-label">Producto</label>
           <input
             type="text"
             id="producto"
             name="producto"
-            className={`form-control ${errores.producto ? 'is-invalid' : ''}`}
+            className={`form-control ${errores.producto ? "is-invalid" : ""}`}
             placeholder="Ej: Collar IRIS"
             value={formulario.producto}
             onChange={handleChange}
@@ -249,31 +235,30 @@ if (productoExistente) {
           />
           {errores.producto && <div className="invalid-feedback">{errores.producto}</div>}
         </div>
-  
+
         <div className="mb-3">
-          <label htmlFor="cantidad" className="form-label">Cantidad (máx. 3 dígitos)</label>
+          <label htmlFor="cantidad" className="form-label">Cantidad</label>
           <input
             type="number"
             id="cantidad"
             name="cantidad"
-            className={`form-control ${errores.cantidad ? 'is-invalid' : ''}`}
+            className={`form-control ${errores.cantidad ? "is-invalid" : ""}`}
             placeholder="Ej: 10"
             value={formulario.cantidad}
             onChange={handleChange}
             min="1"
             max="200"
-            step="1"
           />
           {errores.cantidad && <div className="invalid-feedback">{errores.cantidad}</div>}
         </div>
-  
+
         <div className="mb-3">
-          <label htmlFor="precio" className="form-label">Precio unitario ($ - máx. 5 dígitos)</label>
+          <label htmlFor="precio" className="form-label">Precio unitario ($)</label>
           <input
             type="number"
             id="precio"
             name="precio"
-            className={`form-control ${errores.precio ? 'is-invalid' : ''}`}
+            className={`form-control ${errores.precio ? "is-invalid" : ""}`}
             placeholder="Ej: 2500"
             value={formulario.precio}
             onChange={handleChange}
@@ -283,28 +268,38 @@ if (productoExistente) {
           />
           {errores.precio && <div className="invalid-feedback">{errores.precio}</div>}
         </div>
-<button type="submit" className="btn btn-primary">
-  {editandoIndex === null ? "Agregar" : "Guardar cambios"}
-</button>
+
+        <div className="mb-3">
+          <label htmlFor="imagenUrl" className="form-label">Imagen (URL)</label>
+          <input
+            type="url"
+            id="imagenUrl"
+            name="imagenUrl"
+            className={`form-control ${errores.imagenUrl ? "is-invalid" : ""}`}
+            placeholder="https://ejemplo.com/imagen.jpg"
+            value={formulario.imagenUrl}
+            onChange={handleChange}
+          />
+          {errores.imagenUrl && <div className="invalid-feedback">{errores.imagenUrl}</div>}
+        </div>
+
+        <button type="submit" className="btn btn-primary">
+          {editandoIndex === null ? "Agregar" : "Guardar cambios"}
+        </button>
       </form>
 
-    <StorageInfo 
-      productos={productos} 
-      onClearStorage={limpiarStorage}
-    />
-      
-    <TablaProductos
-  productos={productos}
-  eliminarProducto={(index) => {
-    const nuevosProductos = productos.filter((_, i) => i !== index);
-    setProductos(nuevosProductos);
-  }}
-  editarProducto={iniciarEdicion}
-/>
+      <StorageInfo productos={productos} onClearStorage={limpiarStorage} />
 
-    </> // fin del fragmento
-      
+      <TablaProductos
+        productos={productos}
+        eliminarProducto={(index) => {
+          const nuevosProductos = productos.filter((_, i) => i !== index);
+          setProductos(nuevosProductos);
+        }}
+        editarProducto={iniciarEdicion}
+      />
+    </>
   );
 };
-  
+
 export default ProductForm;
